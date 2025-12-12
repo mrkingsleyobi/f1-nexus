@@ -1,0 +1,141 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/f1-nexus-core",
+    "crates/f1-nexus-telemetry",
+    "crates/f1-nexus-strategy",
+    "crates/f1-nexus-physics",
+    "crates/f1-nexus-weather",
+    "crates/f1-nexus-agents",
+    "crates/f1-nexus-agentdb",
+    "crates/f1-nexus-vectors",
+    "crates/f1-nexus-mcp",
+    "crates/f1-nexus-wasm",
+    "crates/f1-nexus-node",
+    "crates/f1-nexus-cli",
+    "crates/f1-nexus-bench",
+]
+
+[workspace.package]
+version = "1.0.0-alpha.1"
+edition = "2021"
+rust-version = "1.75"
+authors = ["F1 Nexus Team <team@f1nexus.ai>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/f1-nexus/f1-nexus"
+homepage = "https://f1nexus.ai"
+keywords = ["f1", "formula1", "strategy", "optimization", "ai"]
+categories = ["science", "simulation", "algorithms", "wasm"]
+
+[workspace.dependencies]
+# Core dependencies
+tokio = { version = "1.35", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1.6", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Async & networking
+axum = { version = "0.7", features = ["ws", "macros"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+hyper = "1.0"
+reqwest = { version = "0.11", features = ["json", "stream"] }
+
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio", "postgres", "sqlite", "chrono", "uuid"] }
+redis = { version = "0.24", features = ["tokio-comp", "connection-manager"] }
+
+# SIMD & performance
+rayon = "1.8"
+crossbeam = "0.8"
+parking_lot = "0.12"
+dashmap = "5.5"
+smallvec = "1.11"
+
+# Crypto (quantum-resistant via qudag)
+qudag = "1.1"
+ed25519-dalek = "2.1"
+blake3 = "1.5"
+
+# ML/AI libraries (from Ruvnet)
+# temporal-neural-solver = "0.1"  # For sub-microsecond inference
+# neuro-divergent = "0.1"          # Neural forecasting
+# conformal-prediction = "0.1"     # Uncertainty quantification
+# ruvector-core = "0.1"            # Vector database
+# ruvector-postgres = "0.1"        # PostgreSQL integration
+# ruvector-gnn = "0.1"             # Graph neural networks
+# micro-hnsw-wasm = "0.1"          # Lightweight vector search
+
+# Agent frameworks (from Ruvnet)
+# agentic-jujutsu = "0.1"          # Version control for agents
+# ruv-swarm-core = "0.1"           # Swarm intelligence
+# goalie = "0.1"                   # GOAP planning
+
+# Physics & simulation
+nalgebra = "0.32"
+ndarray = { version = "0.15", features = ["rayon"] }
+rand = "0.8"
+rand_distr = "0.4"
+
+# WASM
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = ["Window", "Performance", "GpuDevice"] }
+js-sys = "0.3"
+console_error_panic_hook = "0.1"
+
+# NAPI-RS (Node.js bindings)
+napi = { version = "2.14", features = ["async", "tokio_rt"] }
+napi-derive = "2.14"
+
+# CLI
+clap = { version = "4.4", features = ["derive", "env", "color"] }
+indicatif = "0.17"
+console = "0.15"
+dialoguer = "0.11"
+colored = "2.1"
+
+# Benchmarking
+criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
+divan = "0.1"
+
+# Testing
+proptest = "1.4"
+mockall = "0.12"
+wiremock = "0.5"
+
+# MCP Protocol
+# mcp-server = "0.1"  # Model Context Protocol implementation
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.release-with-debug]
+inherits = "release"
+strip = false
+debug = true
+
+[profile.bench]
+inherits = "release"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+# WASM-specific profile
+[profile.wasm]
+inherits = "release"
+opt-level = "z"  # Optimize for size
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

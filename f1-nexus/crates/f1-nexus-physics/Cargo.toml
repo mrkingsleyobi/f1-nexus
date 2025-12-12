@@ -1,0 +1,8 @@
+[package]
+name = "f1-nexus-physics"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+f1-nexus-core = { path = "../f1-nexus-core" }
+serde = { workspace = true }

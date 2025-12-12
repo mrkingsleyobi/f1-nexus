@@ -1,0 +1,28 @@
+[package]
+name = "f1-nexus-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "F1 Nexus CLI - Command-line interface for F1 strategy optimization"
+
+[[bin]]
+name = "f1-nexus"
+path = "src/main.rs"
+
+[dependencies]
+f1-nexus-core = { path = "../f1-nexus-core" }
+f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
+f1-nexus-mcp = { path = "../f1-nexus-mcp" }
+
+tokio = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+console = { workspace = true }
+indicatif = { workspace = true }
+colored = { workspace = true }

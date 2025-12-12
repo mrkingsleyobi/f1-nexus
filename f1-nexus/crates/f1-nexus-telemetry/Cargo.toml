@@ -1,0 +1,35 @@
+[package]
+name = "f1-nexus-telemetry"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Real-time F1 telemetry processing with sub-millisecond latency"
+
+[dependencies]
+f1-nexus-core = { path = "../f1-nexus-core" }
+
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+# Performance
+rayon = { workspace = true }
+crossbeam = { workspace = true }
+parking_lot = { workspace = true }
+dashmap = { workspace = true }
+
+# Numerical processing
+ndarray = { workspace = true }
+
+# From Ruvnet ecosystem (commented out - to be integrated when published)
+# temporal-neural-solver = "0.1"  # Sub-microsecond anomaly detection
+# bit-parallel-search = "0.1"      # Fast pattern matching
+
+[dev-dependencies]
+criterion = { workspace = true }
+proptest = { workspace = true }

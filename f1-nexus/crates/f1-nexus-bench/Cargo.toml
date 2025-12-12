@@ -1,0 +1,23 @@
+[package]
+name = "f1-nexus-bench"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+f1-nexus-core = { path = "../f1-nexus-core" }
+f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
+
+criterion = { workspace = true }
+divan = { workspace = true }
+
+[[bench]]
+name = "telemetry"
+harness = false
+
+[[bench]]
+name = "strategy"
+harness = false

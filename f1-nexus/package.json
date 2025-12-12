@@ -1,0 +1,53 @@
+{
+  "name": "@f1-nexus/cli",
+  "version": "1.0.0-alpha.1",
+  "description": "F1 Nexus - Next-generation Formula 1 strategy optimization platform",
+  "main": "index.js",
+  "bin": {
+    "f1-nexus": "./bin/f1-nexus"
+  },
+  "scripts": {
+    "build": "cargo build --release",
+    "build:wasm": "wasm-pack build crates/f1-nexus-wasm --target web",
+    "build:node": "cargo build --package f1-nexus-node --release",
+    "test": "cargo test --all",
+    "bench": "cargo bench",
+    "docs": "cargo doc --no-deps --open",
+    "install-cli": "cargo install --path crates/f1-nexus-cli"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/f1-nexus/f1-nexus"
+  },
+  "keywords": [
+    "f1",
+    "formula1",
+    "racing",
+    "strategy",
+    "optimization",
+    "ai",
+    "machine-learning",
+    "telemetry",
+    "simulation",
+    "wasm",
+    "rust"
+  ],
+  "author": "F1 Nexus Team",
+  "license": "MIT OR Apache-2.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "bin/",
+    "target/release/f1-nexus",
+    "README.md",
+    "LICENSE-MIT",
+    "LICENSE-APACHE"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "wasm-pack": "^0.12.0"
+  }
+}
