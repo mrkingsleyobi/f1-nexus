@@ -24,6 +24,7 @@ authors = ["F1 Nexus Team <team@f1nexus.ai>"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/f1-nexus/f1-nexus"
 homepage = "https://f1nexus.ai"
+description = "Next-generation Formula 1 strategy optimization platform"
 keywords = ["f1", "formula1", "strategy", "optimization", "ai"]
 categories = ["science", "simulation", "algorithms", "wasm"]
 

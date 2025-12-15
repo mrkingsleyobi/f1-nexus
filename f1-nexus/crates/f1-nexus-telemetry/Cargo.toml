@@ -8,7 +8,7 @@ repository.workspace = true
 description = "Real-time F1 telemetry processing with sub-millisecond latency"
 
 [dependencies]
-f1-nexus-core = { path = "../f1-nexus-core" }
+f1-nexus-core = { version = "1.0.0-alpha.1", path = "../f1-nexus-core" }
 
 tokio = { workspace = true }
 serde = { workspace = true }

@@ -113,7 +113,7 @@ pub struct TireSensor {
 }
 
 /// Tire compound types
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum TireCompound {
     C0,  // Hardest
     C1,
