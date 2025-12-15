@@ -633,6 +633,7 @@ dependencies = [
 name = "f1-nexus-bench"
 version = "1.0.0-alpha.1"
 dependencies = [
+ "chrono",
  "criterion",
  "divan",
  "f1-nexus-core",
@@ -724,6 +725,7 @@ name = "f1-nexus-telemetry"
 version = "1.0.0-alpha.1"
 dependencies = [
  "anyhow",
+ "chrono",
  "criterion",
  "crossbeam",
  "dashmap",

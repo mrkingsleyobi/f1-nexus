@@ -31,5 +31,6 @@ ndarray = { workspace = true }
 # bit-parallel-search = "0.1"      # Fast pattern matching
 
 [dev-dependencies]
+chrono = { workspace = true, features = ["serde"] }
 criterion = { workspace = true }
 proptest = { workspace = true }

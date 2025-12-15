@@ -29,8 +29,8 @@ impl FuelConsumptionModel {
         FuelConsumptionModel {
             base_rate: TYPICAL_CONSUMPTION,
             track_multiplier: 1.0,
-            fuel_load_factor: 0.003, // 0.3% increase per kg
-            safety_car_rate: 0.4,     // Much lower under SC
+            fuel_load_factor: 0.0005, // 0.05% increase per kg
+            safety_car_rate: 0.4,      // Much lower under SC
         }
     }
 

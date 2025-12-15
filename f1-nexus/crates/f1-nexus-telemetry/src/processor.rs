@@ -114,7 +114,8 @@ pub struct ProcessingStats {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use f1_nexus_core::*;
+    use f1_nexus_core::{*, telemetry::*};
+    use f1_nexus_core::telemetry::ErsMode;
     use chrono::Utc;
 
     fn create_test_snapshot() -> TelemetrySnapshot {
