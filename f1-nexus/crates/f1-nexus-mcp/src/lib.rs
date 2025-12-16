@@ -6,9 +6,11 @@ pub mod server;
 pub mod tools;
 pub mod stdio;
 pub mod sse;
+pub mod weather_api;
 
 pub use server::*;
 pub use tools::*;
+pub use weather_api::*;
 
 use serde::{Deserialize, Serialize};
 
@@ -90,6 +92,18 @@ pub fn get_mcp_tools() -> Vec<McpTool> {
                     "track_id": {"type": "string"}
                 },
                 "required": ["strategy"]
+            }),
+        },
+        McpTool {
+            name: "get_weather_forecast".to_string(),
+            description: "Get real-time weather forecast for a race track".to_string(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "circuit": {"type": "string"},
+                    "api_key": {"type": "string"}
+                },
+                "required": ["circuit"]
             }),
         },
         McpTool {

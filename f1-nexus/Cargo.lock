@@ -736,6 +736,7 @@ dependencies = [
  "f1-nexus-core",
  "f1-nexus-strategy",
  "f1-nexus-telemetry",
+ "reqwest",
  "serde",
  "serde_json",
  "thiserror",

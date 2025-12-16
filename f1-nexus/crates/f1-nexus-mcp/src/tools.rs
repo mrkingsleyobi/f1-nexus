@@ -6,6 +6,7 @@ use f1_nexus_strategy::*;
 use f1_nexus_strategy::simulation::*;
 use serde_json::{json, Value};
 use tracing::{info, warn};
+use crate::weather_api::WeatherApiClient;
 
 /// Handle optimize_strategy tool call
 pub fn handle_optimize_strategy(params: Value) -> Result<Value> {
@@ -301,6 +302,66 @@ pub fn handle_get_agent_consensus(params: Value) -> Result<Value> {
             "recommendation": "Based on current conditions, recommend 2-stop strategy",
             "reasoning": "Single agent analysis suggests optimal pit window at laps 20 and 40",
             "confidence": 0.80,
+        }
+    }))
+}
+
+/// Handle get_weather_forecast tool call
+pub async fn handle_get_weather_forecast(params: Value) -> Result<Value> {
+    info!("MCP tool: get_weather_forecast called");
+
+    let circuit = params["circuit"]
+        .as_str()
+        .ok_or_else(|| anyhow::anyhow!("Missing required parameter: circuit"))?;
+
+    // Get API key from environment or params
+    let api_key = if let Some(key) = params["api_key"].as_str() {
+        key.to_string()
+    } else if let Ok(key) = std::env::var("OPENWEATHERMAP_API_KEY") {
+        key
+    } else {
+        return Err(anyhow::anyhow!(
+            "OpenWeatherMap API key not provided. Set OPENWEATHERMAP_API_KEY env var or pass api_key parameter"
+        ));
+    };
+
+    // Create weather client
+    let client = WeatherApiClient::new(api_key);
+
+    // Fetch weather
+    let forecast = client.get_circuit_weather(circuit).await?;
+
+    // Convert to JSON response
+    Ok(json!({
+        "success": true,
+        "circuit": circuit,
+        "forecast": {
+            "overall_condition": format!("{:?}", forecast.overall_condition),
+            "air_temperature_celsius": forecast.air_temperature,
+            "track_temperature_celsius": forecast.track_temperature,
+            "humidity": forecast.humidity,
+            "wind_speed_kmh": forecast.wind_speed,
+            "wind_direction_degrees": forecast.wind_direction,
+            "rain_probability": forecast.rain_probability,
+            "rainfall_intensity_mmh": forecast.rainfall_intensity,
+            "recommended_tire": format!("{:?}", forecast.recommended_compound()),
+            "sector_conditions": forecast.sector_conditions.iter().map(|s| {
+                json!({
+                    "sector": format!("{:?}", s.sector),
+                    "condition": format!("{:?}", s.condition),
+                    "rain_intensity": s.rain_intensity,
+                    "track_temp": s.track_temp,
+                    "grip_level": s.grip_level,
+                })
+            }).collect::<Vec<_>>(),
+            "predictions": forecast.predictions.iter().map(|p| {
+                json!({
+                    "minutes_ahead": p.minutes_ahead,
+                    "condition": format!("{:?}", p.condition),
+                    "rain_probability": p.rain_probability,
+                    "confidence": p.confidence,
+                })
+            }).collect::<Vec<_>>(),
         }
     }))
 }
