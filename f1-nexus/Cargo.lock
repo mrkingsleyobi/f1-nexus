@@ -732,7 +732,9 @@ version = "1.0.0-alpha.1"
 dependencies = [
  "anyhow",
  "axum",
+ "chrono",
  "f1-nexus-core",
+ "f1-nexus-strategy",
  "f1-nexus-telemetry",
  "serde",
  "serde_json",
