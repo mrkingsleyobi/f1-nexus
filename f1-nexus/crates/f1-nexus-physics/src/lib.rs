@@ -344,7 +344,7 @@ impl AerodynamicsModel {
         &self,
         target_speed_kmh: f32,
         corner_radius: f32,
-        grip_coefficient: f32,
+        _grip_coefficient: f32,
     ) -> WingConfig {
         // For high-speed sections, minimize drag (lower wing angles)
         // For slow corners, maximize downforce (higher wing angles)
