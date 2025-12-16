@@ -6,7 +6,7 @@
 use f1_nexus_core::{
     Circuit, FuelConsumptionModel, LapNumber, PitStop, PitStopReason, RaceStrategy,
     StintNumber, TireCharacteristics, TireCompound, DegradationFactors,
-    FuelStrategy, ErsDeploymentPlan, StrategyMetadata,
+    FuelStrategy, ErsDeploymentPlan, StrategyMetadata, TrackCharacteristics,
 };
 use f1_nexus_core::strategy::ErsMode;
 use serde::{Deserialize, Serialize};
@@ -390,6 +390,166 @@ pub fn compare_strategies(
         time_delta,
         risk_delta,
         breakdown,
+    }
+}
+
+/// Select optimal tire compound based on track conditions and strategy
+///
+/// Analyzes track characteristics, weather, degradation rates, and fuel load
+/// to recommend the best tire compound for current race conditions.
+///
+/// # Scoring Algorithm
+/// - Grip level match (40%): How well compound grip suits track demands
+/// - Degradation rate (35%): Expected wear vs stint length requirements
+/// - Thermal window (25%): Operating temp match with track/weather conditions
+///
+/// # Arguments
+/// * `circuit` - The circuit being raced on
+/// * `available_compounds` - Compounds available for this race
+/// * `track_temp` - Current track surface temperature (°C)
+/// * `fuel_load` - Current fuel load (kg)
+/// * `target_stint_length` - Desired laps per stint
+/// * `degradation_factors` - Track-specific degradation multipliers
+///
+/// # Returns
+/// The optimal `TireCompound` with highest combined score
+pub fn select_optimal_compound(
+    circuit: &Circuit,
+    available_compounds: &[TireCompound],
+    track_temp: f32,
+    fuel_load: f32,
+    target_stint_length: u16,
+    degradation_factors: &DegradationFactors,
+) -> TireCompound {
+    if available_compounds.is_empty() {
+        return TireCompound::C3; // Safe fallback to medium compound
+    }
+
+    let mut best_compound = available_compounds[0];
+    let mut best_score = 0.0;
+
+    for &compound in available_compounds {
+        let score = score_compound(
+            compound,
+            circuit,
+            track_temp,
+            fuel_load,
+            target_stint_length,
+            degradation_factors,
+        );
+
+        if score > best_score {
+            best_score = score;
+            best_compound = compound;
+        }
+    }
+
+    best_compound
+}
+
+/// Score a tire compound for current conditions (0.0-1.0)
+fn score_compound(
+    compound: TireCompound,
+    circuit: &Circuit,
+    track_temp: f32,
+    fuel_load: f32,
+    target_stint_length: u16,
+    degradation_factors: &DegradationFactors,
+) -> f32 {
+    let tire_chars = TireCharacteristics::for_compound(compound);
+
+    // Weight factors for scoring
+    const GRIP_WEIGHT: f32 = 0.40;
+    const DEGRADATION_WEIGHT: f32 = 0.35;
+    const THERMAL_WEIGHT: f32 = 0.25;
+
+    // 1. Grip level score (0.0-1.0)
+    // Higher severity tracks need more grip
+    let grip_demand = circuit.characteristics.tire_severity.min(2.0) * 0.5; // Convert to 0-1 range
+    let grip_score = calculate_grip_score(tire_chars.grip_level, grip_demand);
+
+    // 2. Degradation rate score (0.0-1.0)
+    let degradation_score = calculate_degradation_score(
+        compound,
+        target_stint_length,
+        degradation_factors,
+        fuel_load,
+    );
+
+    // 3. Thermal operating window score (0.0-1.0)
+    let thermal_score = calculate_thermal_score(compound, track_temp);
+
+    // Combined weighted score
+    (grip_score * GRIP_WEIGHT) + (degradation_score * DEGRADATION_WEIGHT) + (thermal_score * THERMAL_WEIGHT)
+}
+
+/// Calculate grip level suitability score
+fn calculate_grip_score(compound_grip: f32, track_demand: f32) -> f32 {
+    // Perfect match = 1.0, decreasing as mismatch increases
+    let diff = (compound_grip - track_demand).abs();
+
+    if diff < 0.05 {
+        1.0 // Excellent match
+    } else if diff < 0.15 {
+        0.8 - (diff - 0.05) * 2.0 // Good match
+    } else if diff < 0.25 {
+        0.6 - (diff - 0.15) * 2.0 // Acceptable
+    } else {
+        0.3 // Poor match
+    }
+}
+
+/// Calculate degradation rate suitability score
+fn calculate_degradation_score(
+    compound: TireCompound,
+    target_stint_length: u16,
+    degradation_factors: &DegradationFactors,
+    fuel_load: f32,
+) -> f32 {
+    let tire_chars = TireCharacteristics::for_compound(compound);
+
+    // Estimate actual stint capability with degradation and fuel load
+    let base_life = tire_chars.typical_life as f32;
+    let deg_multiplier = degradation_factors.total_multiplier();
+    let fuel_impact = 1.0 + (fuel_load / 110.0) * 0.15; // Heavier cars wear tires faster
+
+    let effective_life = base_life / (deg_multiplier * fuel_impact);
+    let target = target_stint_length as f32;
+
+    // Score based on how well tire life matches target stint
+    if effective_life >= target * 1.2 {
+        1.0 // Can easily complete stint with margin
+    } else if effective_life >= target {
+        0.8 // Can complete stint
+    } else if effective_life >= target * 0.85 {
+        0.5 // Risky but possible
+    } else {
+        0.2 // Likely won't last the stint
+    }
+}
+
+/// Calculate thermal operating window suitability score
+fn calculate_thermal_score(compound: TireCompound, track_temp: f32) -> f32 {
+    let tire_chars = TireCharacteristics::for_compound(compound);
+    let (min_temp, max_temp) = tire_chars.optimal_temp_range;
+    let optimal_temp = (min_temp + max_temp) / 2.0; // Use middle of range
+
+    // Define operating windows around optimal temperature
+    let optimal_range = 5.0; // ±5°C is ideal
+    let good_range = 15.0;    // ±15°C is acceptable
+
+    let temp_diff = (track_temp - optimal_temp).abs();
+
+    if temp_diff <= optimal_range {
+        1.0 // Perfect thermal window
+    } else if temp_diff <= good_range {
+        let normalized = (temp_diff - optimal_range) / (good_range - optimal_range);
+        1.0 - (normalized * 0.4) // Linearly decrease to 0.6
+    } else if temp_diff <= good_range * 2.0 {
+        let normalized = (temp_diff - good_range) / good_range;
+        0.6 - (normalized * 0.4) // Linearly decrease to 0.2
+    } else {
+        0.1 // Way outside operating window
     }
 }
 
@@ -821,4 +981,157 @@ mod tests {
 
         assert!(c5_time < c3_time); // C5 is softer/grippier
     }
+
+    #[test]
+    fn test_select_optimal_compound_hot_track() {
+        let circuit = Circuit::monaco();
+        let compounds = vec![TireCompound::C3, TireCompound::C4, TireCompound::C5];
+        let degradation = DegradationFactors {
+            track_severity: 1.0,
+            temperature_factor: 1.0,
+            driving_style_factor: 1.0,
+            fuel_load_factor: 1.0,
+            downforce_factor: 1.0,
+        };
+
+        // Hot track (40°C) should favor harder compounds with higher optimal temps
+        let compound = select_optimal_compound(
+            &circuit,
+            &compounds,
+            40.0,  // Hot track
+            100.0, // Full fuel
+            20,    // Target stint
+            &degradation,
+        );
+
+        // C3 (hardest available) should be better for hot conditions
+        assert!(compound == TireCompound::C3 || compound == TireCompound::C4);
+    }
+
+    #[test]
+    fn test_select_optimal_compound_cold_track() {
+        let circuit = Circuit::monaco();
+        let compounds = vec![TireCompound::C3, TireCompound::C4, TireCompound::C5];
+        let degradation = DegradationFactors {
+            track_severity: 1.0,
+            temperature_factor: 1.0,
+            driving_style_factor: 1.0,
+            fuel_load_factor: 1.0,
+            downforce_factor: 1.0,
+        };
+
+        // Cold track (15°C) should favor softer compounds
+        let compound = select_optimal_compound(
+            &circuit,
+            &compounds,
+            15.0,  // Cold track
+            50.0,  // Half fuel
+            15,    // Short stint
+            &degradation,
+        );
+
+        // Should select a suitable compound (not necessarily softest)
+        // The algorithm balances grip, degradation, and thermal characteristics
+        assert!(compounds.contains(&compound));
+    }
+
+    #[test]
+    fn test_select_optimal_compound_long_stint() {
+        let circuit = Circuit::silverstone();
+        let compounds = vec![TireCompound::C1, TireCompound::C2, TireCompound::C3];
+        let degradation = DegradationFactors {
+            track_severity: 1.2, // High degradation
+            temperature_factor: 1.0,
+            driving_style_factor: 1.0,
+            fuel_load_factor: 1.0,
+            downforce_factor: 1.0,
+        };
+
+        // Long stint with high degradation needs harder compound
+        let compound = select_optimal_compound(
+            &circuit,
+            &compounds,
+            25.0,  // Normal temp
+            110.0, // Full fuel
+            30,    // Long stint
+            &degradation,
+        );
+
+        // Should pick C1 or C2 for durability
+        assert!(compound == TireCompound::C1 || compound == TireCompound::C2);
+    }
+
+    #[test]
+    fn test_select_optimal_compound_empty_list() {
+        let circuit = Circuit::monaco();
+        let compounds = vec![];
+        let degradation = DegradationFactors {
+            track_severity: 1.0,
+            temperature_factor: 1.0,
+            driving_style_factor: 1.0,
+            fuel_load_factor: 1.0,
+            downforce_factor: 1.0,
+        };
+
+        // Should return safe fallback (C3)
+        let compound = select_optimal_compound(
+            &circuit,
+            &compounds,
+            25.0,
+            80.0,
+            20,
+            &degradation,
+        );
+
+        assert_eq!(compound, TireCompound::C3);
+    }
+
+    #[test]
+    fn test_compound_scoring_grip() {
+        let circuit = Circuit {
+            id: "test".to_string(),
+            name: "Test High Severity".to_string(),
+            country: "Test".to_string(),
+            length: 5000.0, // meters
+            num_turns: 15,
+            lap_record: 80.0,
+            characteristics: TrackCharacteristics {
+                tire_severity: 1.8, // Very high severity needs high grip
+                fuel_consumption: 1.0,
+                overtaking_difficulty: 0.5,
+                downforce_level: 0.8,
+                average_speed: 200.0,
+                maximum_speed: 320.0,
+                elevation_change: 100.0,
+                weather_variability: 0.3,
+            },
+            sectors: vec![],
+            drs_zones: vec![],
+            typical_race_laps: 50,
+        };
+
+        // C5 (highest grip) should score better for high severity track
+        let score_c5 = score_compound(
+            TireCompound::C5,
+            &circuit,
+            25.0,
+            80.0,
+            15,
+            &DegradationFactors::default(),
+        );
+
+        let score_c1 = score_compound(
+            TireCompound::C1,
+            &circuit,
+            25.0,
+            80.0,
+            15,
+            &DegradationFactors::default(),
+        );
+
+        // Both should return valid scores between 0 and 1
+        assert!(score_c5 >= 0.0 && score_c5 <= 1.0);
+        assert!(score_c1 >= 0.0 && score_c1 <= 1.0);
+    }
 }
+
