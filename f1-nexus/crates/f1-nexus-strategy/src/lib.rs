@@ -65,6 +65,7 @@ pub struct CompetitorState {
 
 /// Dynamic programming state for optimization
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 struct DPState {
     /// Best time to this state
     best_time: f32,
@@ -335,15 +336,13 @@ pub fn estimate_time_loss(config: &OptimizationConfig, lap: u16) -> f32 {
     let base_loss = config.pit_lane_time_loss + config.tire_change_time;
 
     // Fuel load impact: lighter car = less time lost in acceleration
-    let fuel_remaining = config.fuel_model.fuel_needed_for_laps(
-        (config.total_laps - lap) as u16,
-        config.starting_fuel,
-    );
-    let fuel_factor = 1.0 - (fuel_remaining / config.starting_fuel) * 0.05;
+    // Early in race (heavy car) = more time lost, late in race (light car) = less time lost
+    let laps_completed_ratio = lap as f32 / config.total_laps as f32;
+    let fuel_factor = 1.0 + (1.0 - laps_completed_ratio) * 0.1; // 0-10% increase based on fuel
 
-    // Track position impact: risk of losing positions
+    // Track position impact: risk of losing positions (constant per pit stop)
     let position_penalty = if config.current_position <= 3 {
-        2.0 // Higher risk in top positions
+        1.5 // Higher risk in top positions
     } else if config.current_position <= 10 {
         1.0 // Moderate risk in points positions
     } else {
@@ -447,8 +446,8 @@ fn calculate_lap_time(
     );
     let fuel_penalty = (fuel_remaining / config.starting_fuel) * 0.3; // Up to 0.3s
 
-    // Compound grip level impact
-    let grip_bonus = (tire_chars.grip_level - 0.85) * 0.5; // Faster/slower based on grip
+    // Compound grip level impact (higher grip = faster lap times)
+    let grip_bonus = (tire_chars.grip_level - 0.75) * 2.0; // Softer compounds are faster
 
     base_time + wear_penalty + fuel_penalty - grip_bonus
 }
@@ -491,8 +490,9 @@ fn is_valid_strategy(pit_stops: &[PitStop], config: &OptimizationConfig) -> bool
         return false;
     }
 
-    // All pit stops must use different compounds (simplified regulation check)
+    // Collect all compounds used (including starting compound)
     let mut compounds: Vec<TireCompound> = pit_stops.iter().map(|ps| ps.compound).collect();
+    compounds.push(config.available_compounds[0]); // Add starting compound
     compounds.sort();
     compounds.dedup();
 
@@ -511,27 +511,30 @@ fn calculate_expected_lap_times(
     let mut stint_start_lap = 1;
 
     for lap in 1..=config.total_laps {
-        // Check if we pit on this lap
+        // Calculate lap time for current stint BEFORE checking for pit
+        let tire_age = if lap >= stint_start_lap {
+            lap - stint_start_lap + 1
+        } else {
+            1
+        };
+
+        let compound = if current_stint == 0 {
+            config.available_compounds[0]
+        } else {
+            pit_stops.get(current_stint - 1).map(|ps| ps.compound)
+                .unwrap_or(config.available_compounds[0])
+        };
+
+        let lap_time = calculate_lap_time(compound, tire_age, config, lap);
+
+        lap_times.entry(StintNumber(current_stint as u8))
+            .or_insert_with(Vec::new)
+            .push(lap_time);
+
+        // Check if we pit AFTER this lap (for next lap's stint)
         if pit_stops.iter().any(|ps| ps.lap.0 == lap) {
             current_stint += 1;
             stint_start_lap = lap + 1;
-        }
-
-        // Calculate lap time for current stint
-        if lap > 0 {
-            let tire_age = lap - stint_start_lap + 1;
-            let compound = if current_stint == 0 {
-                config.available_compounds[0]
-            } else {
-                pit_stops.get(current_stint - 1).map(|ps| ps.compound)
-                    .unwrap_or(config.available_compounds[0])
-            };
-
-            let lap_time = calculate_lap_time(compound, tire_age, config, lap);
-
-            lap_times.entry(StintNumber(current_stint as u8))
-                .or_insert_with(Vec::new)
-                .push(lap_time);
         }
     }
 
