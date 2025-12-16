@@ -27,3 +27,4 @@ tracing-subscriber = { workspace = true }
 console = { workspace = true }
 indicatif = { workspace = true }
 colored = { workspace = true }
+chrono = { workspace = true }

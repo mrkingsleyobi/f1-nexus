@@ -51,7 +51,10 @@ pub async fn run(track: String, lap: Option<u16>, strategy_type: String) -> Resu
     progress.set_message("Analyzing tire strategies...");
     let strategy = tokio::task::spawn_blocking(move || {
         optimize_pit_strategy(&config)
-    }).await??;
+    })
+    .await
+    .map_err(|e| anyhow::anyhow!("Task join error: {}", e))?
+    .map_err(|e| anyhow::anyhow!("Optimization error: {}", e))?;
 
     progress.finish_with_message("Optimization complete!");
 
@@ -60,12 +63,12 @@ pub async fn run(track: String, lap: Option<u16>, strategy_type: String) -> Resu
 
     println!("\n{}", "Pit Stops:".green());
     for (i, stop) in strategy.pit_stops.iter().enumerate() {
-        println!("  {}. Lap {} (Stint {})",
+        println!("  {}. Lap {} → {}",
             i + 1,
             stop.lap.0,
-            stop.stint.0,
+            format_compound(stop.compound),
         );
-        println!("     Reason: {:?}", stop.reason);
+        println!("     Reason: {:?}, Confidence: {:.1}%", stop.reason, stop.confidence * 100.0);
     }
 
     println!("\n{}", "Tire Strategy:".green());

@@ -1,7 +1,9 @@
 //! Race simulation command
 
 use anyhow::Result;
+use chrono;
 use colored::*;
+use f1_nexus_core::strategy::ErsMode;
 use f1_nexus_core::*;
 use f1_nexus_strategy::simulation::*;
 use indicatif::ProgressBar;
@@ -18,31 +20,37 @@ pub async fn run(track: String, num_sims: u64) -> Result<()> {
 
     // Create a basic race strategy
     let strategy = RaceStrategy {
+        id: format!("sim-{}-{}", track, chrono::Utc::now().timestamp()),
         starting_compound: TireCompound::C3,
         pit_stops: vec![
             PitStop {
                 lap: LapNumber(25),
+                compound: TireCompound::C2,
+                pit_loss: 22.0,
                 reason: PitStopReason::Mandatory,
-                stint: StintNumber(1),
+                confidence: 0.85,
             },
         ],
         fuel_strategy: FuelStrategy {
             starting_fuel: 110.0,
+            fuel_saving_per_lap: 0.0,
             fuel_saving_laps: vec![],
+            minimum_buffer: 3.0,
         },
         ers_plan: ErsDeploymentPlan {
-            qualifying_mode_laps: vec![],
+            default_mode: ErsMode::Medium,
+            lap_overrides: std::collections::BTreeMap::new(),
             overtake_laps: vec![],
-            battery_management_laps: vec![],
         },
+        expected_lap_times: std::collections::BTreeMap::new(),
+        predicted_race_time: 0.0, // Will be updated by simulation
+        confidence: 0.8,
         metadata: StrategyMetadata {
-            predicted_race_time: None,
-            tire_allocations: vec![
-                (TireCompound::C3, 2),
-                (TireCompound::C2, 2),
-            ],
-            safety_car_probability: 0.3,
-            rain_probability: 0.1,
+            generated_at: chrono::Utc::now(),
+            num_simulations: 1,
+            contributing_agents: vec!["cli-simulator".to_string()],
+            version_hash: None,
+            parent_strategy_id: None,
         },
     };
 
@@ -51,7 +59,7 @@ pub async fn run(track: String, num_sims: u64) -> Result<()> {
         initial_condition: WeatherCondition::Dry,
         track_temperature: 30.0,
         air_temperature: 25.0,
-        weather_changes: vec![],
+        changes: vec![],
     };
 
     // Create simulator
