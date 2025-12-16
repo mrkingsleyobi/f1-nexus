@@ -698,6 +698,7 @@ dependencies = [
  "console",
  "f1-nexus-core",
  "f1-nexus-mcp",
+ "f1-nexus-strategy",
  "f1-nexus-telemetry",
  "indicatif",
  "serde",

@@ -14,6 +14,7 @@ path = "src/main.rs"
 [dependencies]
 f1-nexus-core = { path = "../f1-nexus-core" }
 f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
+f1-nexus-strategy = { path = "../f1-nexus-strategy" }
 f1-nexus-mcp = { path = "../f1-nexus-mcp" }
 
 tokio = { workspace = true }

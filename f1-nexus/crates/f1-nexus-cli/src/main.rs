@@ -6,6 +6,8 @@ use clap::{Parser, Subcommand};
 use colored::*;
 use tracing::info;
 
+mod commands;
+
 #[derive(Parser)]
 #[command(name = "f1-nexus")]
 #[command(about = "F1 Nexus - Next-generation Formula 1 strategy optimizer", long_about = None)]
@@ -113,51 +115,11 @@ async fn main() -> anyhow::Result<()> {
         }
 
         Commands::Optimize { track, lap, strategy } => {
-            info!("Optimizing strategy for track: {}", track);
-            println!("\n{}", "Running strategy optimization...".cyan());
-            println!("Track: {}", track.yellow());
-            println!("Current Lap: {}", lap.unwrap_or(1).to_string().yellow());
-            println!("Strategy Type: {}", strategy.yellow());
-
-            // Simulate optimization
-            let progress = indicatif::ProgressBar::new(100);
-            progress.set_style(
-                indicatif::ProgressStyle::default_bar()
-                    .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len} {msg}")
-                    .unwrap()
-            );
-
-            for i in 0..100 {
-                progress.inc(1);
-                progress.set_message(format!("Simulation {}/10000000", i * 100000));
-                tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
-            }
-            progress.finish_with_message("Optimization complete!");
-
-            println!("\n{}", "Optimal Strategy:".green().bold());
-            println!("  Pit Stop: Lap 25");
-            println!("  Tire Compound: C2 → C3");
-            println!("  Expected Finish Time: 1:32:15.423");
-            println!("  Confidence: 87%");
+            commands::optimize::run(track, lap, strategy).await?;
         }
 
         Commands::Simulate { track, num_sims } => {
-            info!("Running race simulation for {}", track);
-            println!("\n{}", "Running Monte Carlo simulation...".cyan());
-            println!("Simulations: {}", num_sims.to_string().yellow());
-            println!("Track: {}", track.yellow());
-
-            let progress = indicatif::ProgressBar::new(num_sims);
-            for _ in 0..num_sims {
-                progress.inc(1);
-            }
-            progress.finish();
-
-            println!("\n{}", "Simulation Results:".green().bold());
-            println!("  Mean Race Time: 5420.3s");
-            println!("  Std Deviation: 12.5s");
-            println!("  P50: 5418.2s");
-            println!("  P95: 5445.8s");
+            commands::simulate::run(track, num_sims).await?;
         }
 
         Commands::Mcp { transport, port } => {
