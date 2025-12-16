@@ -19,6 +19,8 @@ uuid = { workspace = true }
 chrono = { workspace = true }
 nalgebra = { workspace = true }
 tracing = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true }
 
 [dev-dependencies]
 proptest = { workspace = true }

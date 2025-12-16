@@ -28,7 +28,8 @@ pub struct TelemetryEngine {
 #[derive(Debug, Clone)]
 pub enum TelemetryEvent {
     Snapshot(TelemetrySnapshot),
-    Anomaly(AnomalyAlert),
+    Anomaly(AnomalyInfo),
+    LegacyAnomaly(AnomalyAlert), // For backward compatibility
     StreamStart { session_id: String },
     StreamEnd { session_id: String },
 }
@@ -50,8 +51,9 @@ impl TelemetryEngine {
         // Process telemetry (validation, normalization, etc.)
         self.processor.process(&snapshot)?;
 
-        // Run anomaly detection
-        if let Some(anomaly) = self.anomaly_detector.detect(&snapshot)? {
+        // Run anomaly detection (new statistical detector)
+        let anomalies = self.anomaly_detector.detect(&snapshot);
+        for anomaly in anomalies {
             let _ = self.tx.send(TelemetryEvent::Anomaly(anomaly));
         }
 

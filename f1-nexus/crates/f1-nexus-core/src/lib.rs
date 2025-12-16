@@ -12,6 +12,7 @@ pub mod weather;
 pub mod tire;
 pub mod fuel;
 pub mod types;
+pub mod api;
 
 pub use telemetry::*;
 pub use strategy::*;
@@ -22,6 +23,7 @@ pub use weather::*;
 pub use tire::*;
 pub use fuel::*;
 pub use types::*;
+pub use api::*;
 
 /// F1 Nexus version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
