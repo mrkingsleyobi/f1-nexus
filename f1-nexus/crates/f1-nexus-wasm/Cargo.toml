@@ -13,14 +13,17 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 f1-nexus-core = { path = "../f1-nexus-core" }
 f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
+f1-nexus-strategy = { path = "../f1-nexus-strategy" }
 
 serde = { workspace = true }
 serde_json = { workspace = true }
 wasm-bindgen = { workspace = true }
 wasm-bindgen-futures = { workspace = true }
+serde-wasm-bindgen = "0.6"
 js-sys = { workspace = true }
 web-sys = { workspace = true }
 console_error_panic_hook = { workspace = true }
+chrono = { workspace = true }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
