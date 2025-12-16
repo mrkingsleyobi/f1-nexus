@@ -749,7 +749,9 @@ dependencies = [
 name = "f1-nexus-node"
 version = "1.0.0-alpha.1"
 dependencies = [
+ "chrono",
  "f1-nexus-core",
+ "f1-nexus-strategy",
  "f1-nexus-telemetry",
  "napi",
  "napi-build",

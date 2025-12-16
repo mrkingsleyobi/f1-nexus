@@ -13,12 +13,14 @@ crate-type = ["cdylib"]
 [dependencies]
 f1-nexus-core = { path = "../f1-nexus-core" }
 f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
+f1-nexus-strategy = { path = "../f1-nexus-strategy" }
 
 napi = { workspace = true }
 napi-derive = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
+chrono = { workspace = true }
 
 [build-dependencies]
 napi-build = "2"
