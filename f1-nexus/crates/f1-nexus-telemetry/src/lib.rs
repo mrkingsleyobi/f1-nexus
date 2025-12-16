@@ -7,11 +7,13 @@ pub mod processor;
 pub mod stream;
 pub mod anomaly;
 pub mod buffer;
+pub mod predictor;
 
 pub use processor::*;
 pub use stream::*;
 pub use anomaly::*;
 pub use buffer::*;
+pub use predictor::*;
 
 use f1_nexus_core::TelemetrySnapshot;
 use std::sync::Arc;
