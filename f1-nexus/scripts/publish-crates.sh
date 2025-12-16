@@ -35,7 +35,7 @@ CRATES_TO_PUBLISH=(
     "f1-nexus-agents"
     "f1-nexus-wasm"
     "f1-nexus-mcp"
-    "f1-nexus-napi"
+    "f1-nexus-node"
     "f1-nexus-cli"
 )
 
