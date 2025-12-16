@@ -9,7 +9,7 @@
 //! - Strategy validation and warnings
 
 use f1_nexus_core::{
-    Circuit, FuelConsumptionModel, LapNumber, PitStop, RaceStrategy,
+    Circuit, FuelConsumptionModel, LapNumber, RaceStrategy,
     TireCharacteristics, TireCompound, DegradationFactors,
     WeatherForecast, WeatherCondition,
 };
@@ -348,37 +348,59 @@ impl RaceSimulator {
 
     /// Calculate penalty from weather conditions
     fn calculate_weather_penalty(&self, weather: WeatherCondition, compound: TireCompound) -> f32 {
-        match (weather, compound) {
-            // Correct tire choices
-            (WeatherCondition::Dry, TireCompound::C0..=TireCompound::C5) => 0.0,
-            (WeatherCondition::Cloudy, TireCompound::C0..=TireCompound::C5) => 0.0,
-            (WeatherCondition::PartlyCloudy, TireCompound::C0..=TireCompound::C5) => 0.0,
-            (WeatherCondition::LightRain, TireCompound::Intermediate) => 0.0,
-            (WeatherCondition::HeavyRain, TireCompound::Wet) => 0.0,
+        let is_dry_compound = matches!(
+            compound,
+            TireCompound::C0 | TireCompound::C1 | TireCompound::C2 |
+            TireCompound::C3 | TireCompound::C4 | TireCompound::C5
+        );
 
-            // Wrong tire in rain
-            (WeatherCondition::LightRain, TireCompound::C0..=TireCompound::C5) => 5.0,
-            (WeatherCondition::HeavyRain, TireCompound::C0..=TireCompound::C5) => 15.0,
-            (WeatherCondition::HeavyRain, TireCompound::Intermediate) => 3.0,
-
-            // Wets/Inters on dry track
-            (WeatherCondition::Dry, TireCompound::Intermediate) => 2.5,
-            (WeatherCondition::Dry, TireCompound::Wet) => 5.0,
-            (WeatherCondition::Cloudy, TireCompound::Wet) => 4.0,
-
-            // Other combinations
-            _ => 1.0,
+        match weather {
+            WeatherCondition::Dry | WeatherCondition::Cloudy | WeatherCondition::PartlyCloudy => {
+                if is_dry_compound {
+                    0.0 // Correct choice
+                } else if compound == TireCompound::Intermediate {
+                    2.5 // Inters on dry
+                } else if compound == TireCompound::Wet {
+                    if weather == WeatherCondition::Dry { 5.0 } else { 4.0 }
+                } else {
+                    1.0
+                }
+            }
+            WeatherCondition::LightRain => {
+                if compound == TireCompound::Intermediate {
+                    0.0 // Correct choice
+                } else if is_dry_compound {
+                    5.0 // Dry tires in rain - dangerous
+                } else {
+                    1.0 // Wets in light rain - OK but not optimal
+                }
+            }
+            WeatherCondition::HeavyRain => {
+                if compound == TireCompound::Wet {
+                    0.0 // Correct choice
+                } else if compound == TireCompound::Intermediate {
+                    3.0 // Inters in heavy rain - risky
+                } else if is_dry_compound {
+                    15.0 // Dry tires in heavy rain - very dangerous
+                } else {
+                    1.0
+                }
+            }
         }
     }
 
     /// Check if tire compound is inappropriate for weather
     fn is_wrong_tire_for_weather(&self, compound: TireCompound, weather: WeatherCondition) -> bool {
-        matches!(
-            (weather, compound),
-            (WeatherCondition::LightRain, TireCompound::C0..=TireCompound::C5) |
-            (WeatherCondition::HeavyRain, TireCompound::C0..=TireCompound::C5) |
-            (WeatherCondition::HeavyRain, TireCompound::Intermediate)
-        )
+        let is_dry_compound = matches!(
+            compound,
+            TireCompound::C0 | TireCompound::C1 | TireCompound::C2 |
+            TireCompound::C3 | TireCompound::C4 | TireCompound::C5
+        );
+
+        (match weather {
+            WeatherCondition::LightRain | WeatherCondition::HeavyRain => is_dry_compound,
+            _ => false,
+        }) || (weather == WeatherCondition::HeavyRain && compound == TireCompound::Intermediate)
     }
 }
 
@@ -386,7 +408,7 @@ impl RaceSimulator {
 pub fn create_simulator(
     circuit: Circuit,
     strategy: RaceStrategy,
-    degradation_factors: DegradationFactors,
+    _degradation_factors: DegradationFactors,
 ) -> RaceSimulator {
     let mut fuel_model = FuelConsumptionModel::default_model();
     fuel_model.track_multiplier = circuit.characteristics.fuel_consumption;

@@ -3,6 +3,9 @@
 //! This crate provides advanced pit stop strategy optimization using dynamic programming,
 //! tire degradation modeling, fuel consumption analysis, and competitor strategy simulation.
 
+// Modules
+pub mod simulation;
+
 use f1_nexus_core::{
     Circuit, FuelConsumptionModel, LapNumber, PitStop, PitStopReason, RaceStrategy,
     StintNumber, TireCharacteristics, TireCompound, DegradationFactors,
