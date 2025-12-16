@@ -12,6 +12,8 @@ pub mod weather;
 pub mod tire;
 pub mod fuel;
 pub mod types;
+
+#[cfg(not(target_arch = "wasm32"))]
 pub mod api;
 
 pub use telemetry::*;
@@ -23,6 +25,8 @@ pub use weather::*;
 pub use tire::*;
 pub use fuel::*;
 pub use types::*;
+
+#[cfg(not(target_arch = "wasm32"))]
 pub use api::*;
 
 /// F1 Nexus version

@@ -10,13 +10,15 @@ description = "Real-time F1 telemetry processing with sub-millisecond latency"
 [dependencies]
 f1-nexus-core = { version = "1.0.0-alpha.2", path = "../f1-nexus-core" }
 
-tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { workspace = true }
 axum = { workspace = true }
 futures = { workspace = true }
 
