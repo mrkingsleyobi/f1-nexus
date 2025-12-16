@@ -663,7 +663,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-agentdb"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "f1-nexus-core",
  "serde",
@@ -671,7 +671,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-agents"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "f1-nexus-core",
  "serde",
@@ -679,7 +679,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-bench"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "chrono",
  "criterion",
@@ -690,7 +690,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-cli"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anyhow",
  "chrono",
@@ -711,7 +711,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-core"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anyhow",
  "chrono",
@@ -728,7 +728,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-mcp"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anyhow",
  "axum",
@@ -747,7 +747,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-node"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "chrono",
  "f1-nexus-core",
@@ -763,7 +763,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-physics"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "f1-nexus-core",
  "serde",
@@ -771,7 +771,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-strategy"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "chrono",
  "f1-nexus-core",
@@ -781,7 +781,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-telemetry"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anyhow",
  "axum",
@@ -804,7 +804,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-vectors"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "f1-nexus-core",
  "serde",
@@ -812,7 +812,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-wasm"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "chrono",
  "console_error_panic_hook",
@@ -831,7 +831,7 @@ dependencies = [
 
 [[package]]
 name = "f1-nexus-weather"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "f1-nexus-core",
  "serde",

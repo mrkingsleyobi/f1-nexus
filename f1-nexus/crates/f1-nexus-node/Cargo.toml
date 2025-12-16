@@ -11,9 +11,9 @@ description = "F1 Nexus NAPI-RS bindings for Node.js"
 crate-type = ["cdylib"]
 
 [dependencies]
-f1-nexus-core = { path = "../f1-nexus-core" }
-f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
-f1-nexus-strategy = { path = "../f1-nexus-strategy" }
+f1-nexus-core = { version = "1.0.0-alpha.2", path = "../f1-nexus-core" }
+f1-nexus-telemetry = { version = "1.0.0-alpha.2", path = "../f1-nexus-telemetry" }
+f1-nexus-strategy = { version = "1.0.0-alpha.2", path = "../f1-nexus-strategy" }
 
 napi = { workspace = true }
 napi-derive = { workspace = true }

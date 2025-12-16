@@ -12,10 +12,10 @@ name = "f1-nexus"
 path = "src/main.rs"
 
 [dependencies]
-f1-nexus-core = { path = "../f1-nexus-core" }
-f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
-f1-nexus-strategy = { path = "../f1-nexus-strategy" }
-f1-nexus-mcp = { path = "../f1-nexus-mcp" }
+f1-nexus-core = { version = "1.0.0-alpha.2", path = "../f1-nexus-core" }
+f1-nexus-telemetry = { version = "1.0.0-alpha.2", path = "../f1-nexus-telemetry" }
+f1-nexus-strategy = { version = "1.0.0-alpha.2", path = "../f1-nexus-strategy" }
+f1-nexus-mcp = { version = "1.0.0-alpha.2", path = "../f1-nexus-mcp" }
 
 tokio = { workspace = true }
 clap = { workspace = true }
