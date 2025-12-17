@@ -10,6 +10,7 @@ publish = false
 [dependencies]
 f1-nexus-core = { path = "../f1-nexus-core" }
 f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
+chrono = { workspace = true }
 
 criterion = { workspace = true }
 divan = { workspace = true }

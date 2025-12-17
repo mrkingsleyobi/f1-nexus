@@ -65,7 +65,7 @@ pub enum PitStopReason {
     Undercut,
     Overcut,
     SafetyCar,
-    Virtual SafetyCar,
+    VirtualSafetyCar,
     Opportunistic,
 }
 

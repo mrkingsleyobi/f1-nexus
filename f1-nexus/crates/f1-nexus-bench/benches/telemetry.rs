@@ -1,5 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use f1_nexus_core::*;
+use f1_nexus_core::{*, telemetry::*};
+use f1_nexus_core::telemetry::ErsMode;
 use f1_nexus_telemetry::*;
 use chrono::Utc;
 

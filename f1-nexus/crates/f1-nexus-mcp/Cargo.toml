@@ -8,8 +8,9 @@ repository.workspace = true
 description = "Model Context Protocol (MCP) server for F1 Nexus"
 
 [dependencies]
-f1-nexus-core = { path = "../f1-nexus-core" }
-f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
+f1-nexus-core = { version = "1.0.0-alpha.2", path = "../f1-nexus-core" }
+f1-nexus-telemetry = { version = "1.0.0-alpha.2", path = "../f1-nexus-telemetry" }
+f1-nexus-strategy = { version = "1.0.0-alpha.2", path = "../f1-nexus-strategy" }
 
 tokio = { workspace = true }
 serde = { workspace = true }
@@ -17,7 +18,9 @@ serde_json = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
+chrono = { workspace = true }
 axum = { workspace = true }
 tower-http = { workspace = true }
+reqwest = { version = "0.11", features = ["json"] }
 
 [dev-dependencies]

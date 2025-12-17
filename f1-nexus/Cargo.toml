@@ -17,14 +17,15 @@ members = [
 ]
 
 [workspace.package]
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 edition = "2021"
 rust-version = "1.75"
 authors = ["F1 Nexus Team <team@f1nexus.ai>"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/f1-nexus/f1-nexus"
-homepage = "https://f1nexus.ai"
-keywords = ["f1", "formula1", "strategy", "optimization", "ai"]
+repository = "https://github.com/mrkingsleyobi/f1-nexus"
+homepage = "https://github.com/mrkingsleyobi/f1-nexus"
+description = "Next-generation Formula 1 strategy optimization platform with AI-powered race simulation"
+keywords = ["f1", "formula1", "racing", "strategy", "simulation"]
 categories = ["science", "simulation", "algorithms", "wasm"]
 
 [workspace.dependencies]
@@ -45,6 +46,7 @@ tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 hyper = "1.0"
 reqwest = { version = "0.11", features = ["json", "stream"] }
+futures = "0.3"
 
 # Database
 sqlx = { version = "0.7", features = ["runtime-tokio", "postgres", "sqlite", "chrono", "uuid"] }

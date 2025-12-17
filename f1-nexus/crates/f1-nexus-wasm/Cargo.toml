@@ -7,20 +7,26 @@ license.workspace = true
 repository.workspace = true
 description = "F1 Nexus WASM modules for browser deployment"
 
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-f1-nexus-core = { path = "../f1-nexus-core" }
-f1-nexus-telemetry = { path = "../f1-nexus-telemetry" }
+f1-nexus-core = { version = "1.0.0-alpha.2", path = "../f1-nexus-core" }
+f1-nexus-strategy = { version = "1.0.0-alpha.2", path = "../f1-nexus-strategy" }
 
 serde = { workspace = true }
 serde_json = { workspace = true }
 wasm-bindgen = { workspace = true }
 wasm-bindgen-futures = { workspace = true }
+serde-wasm-bindgen = "0.6"
 js-sys = { workspace = true }
 web-sys = { workspace = true }
 console_error_panic_hook = { workspace = true }
+chrono = { workspace = true }
+uuid = { version = "1.6", features = ["v4", "serde", "js"] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

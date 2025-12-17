@@ -4,15 +4,16 @@ use crate::{TelemetryConfig, TelemetryError};
 use f1_nexus_core::TelemetrySnapshot;
 use serde::{Deserialize, Serialize};
 
-/// Anomaly detector using neural inference
-pub struct AnomalyDetector {
+/// Legacy anomaly detector using simple rule-based inference
+/// Note: Use `processor::AnomalyDetector` for statistical anomaly detection
+pub struct LegacyAnomalyDetector {
     config: TelemetryConfig,
     // In production: temporal-neural-solver model would be here
 }
 
-impl AnomalyDetector {
+impl LegacyAnomalyDetector {
     pub fn new(config: TelemetryConfig) -> Self {
-        AnomalyDetector { config }
+        LegacyAnomalyDetector { config }
     }
 
     /// Detect anomalies in telemetry snapshot

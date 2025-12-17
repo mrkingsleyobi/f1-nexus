@@ -2,7 +2,14 @@
 name = "f1-nexus-agentdb"
 version.workspace = true
 edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+categories.workspace = true
 
 [dependencies]
-f1-nexus-core = { path = "../f1-nexus-core" }
+f1-nexus-core = { version = "1.0.0-alpha.2", path = "../f1-nexus-core" }
 serde = { workspace = true }
