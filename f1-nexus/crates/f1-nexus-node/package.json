@@ -1,7 +1,7 @@
 {
   "name": "@f1-nexus/node",
   "version": "1.0.0-alpha.2",
-  "description": "F1 Nexus NAPI-RS bindings for Node.js",
+  "description": "High-performance Formula 1 race strategy optimization for Node.js using native Rust bindings - 100x faster than JavaScript",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
@@ -10,15 +10,38 @@
   "files": [
     "index.js",
     "index.d.ts",
-    "*.node"
+    "*.node",
+    "README.md"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/mrkingsleyobi/f1-nexus"
   },
-  "keywords": ["f1", "racing", "strategy", "napi", "native", "formula1"],
+  "bugs": {
+    "url": "https://github.com/mrkingsleyobi/f1-nexus/issues"
+  },
+  "homepage": "https://github.com/mrkingsleyobi/f1-nexus#readme",
+  "keywords": [
+    "f1",
+    "formula1",
+    "formula-1",
+    "racing",
+    "motorsport",
+    "strategy",
+    "optimization",
+    "napi",
+    "native",
+    "rust",
+    "pit-stop",
+    "tire-strategy",
+    "race-simulation",
+    "monte-carlo",
+    "typescript",
+    "nodejs",
+    "performance"
+  ],
   "author": "F1 Nexus Contributors",
-  "license": "MIT OR Apache-2.0",
+  "license": "(MIT OR Apache-2.0)",
   "engines": {
     "node": ">= 14"
   }
